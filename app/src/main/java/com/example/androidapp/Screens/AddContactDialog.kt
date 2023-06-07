@@ -26,7 +26,7 @@ fun AddContactDialog(
         onDismissRequest = {
             onEvent(FahrzeugEvent.HideDialog)
         },
-        title = { Text(text = "Add contact") },
+        title = { Text(text = "Fahrzeug inserieren") },
         text = {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)

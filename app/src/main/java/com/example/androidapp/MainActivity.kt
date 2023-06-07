@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
@@ -13,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -59,10 +62,11 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     bottomBar = {
                         BottomNavigationBar(navController)
+                    },
+                    content = { innerPadding ->
+                        NavigationHost(navController, modifier = Modifier.padding(innerPadding))
                     }
-                ) {
-                    NavigationHost(navController)
-                }
+                )
             }
         }
     }
@@ -106,13 +110,15 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun NavigationHost(navController: NavHostController) {
-        NavHost(navController, startDestination = Screen.Search.route) {
-            composable(Screen.Favorites.route) { FavoritesScreen() }
-            composable(Screen.Search.route) { SearchScreen(viewModel.state.collectAsState().value) }
-            composable(Screen.Post.route) { PostScreen() }
-            composable(Screen.Messages.route) { MessagesScreen() }
-            composable(Screen.Settings.route) { SettingsScreen() }
+    fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
+        Box(modifier) {
+            NavHost(navController, startDestination = Screen.Search.route) {
+                composable(Screen.Favorites.route) { FavoritesScreen() }
+                composable(Screen.Search.route) { SearchScreen(viewModel.state.collectAsState().value) }
+                composable(Screen.Post.route) { PostScreen() }
+                composable(Screen.Messages.route) { MessagesScreen() }
+                composable(Screen.Settings.route) { SettingsScreen() }
+            }
         }
     }
 
