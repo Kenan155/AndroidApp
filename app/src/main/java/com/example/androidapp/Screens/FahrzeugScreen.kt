@@ -34,6 +34,7 @@ fun FahrzeugScreen(
     onEvent: (FahrzeugEvent) -> Unit
 ) {
     val (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
+    val expanded = remember { mutableStateOf(false) }
 
     Scaffold() { _ ->
         if(state.isAddingFahrzeug) {
@@ -46,27 +47,40 @@ fun FahrzeugScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             item {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    verticalAlignment = Alignment.CenterVertically
+                        .horizontalScroll(rememberScrollState())
                 ) {
-                    SortType.values().forEach { sortType ->
-                        Row(
-                            modifier = Modifier
-                                .clickable {
-                                    onEvent(FahrzeugEvent.SortContacts(sortType))
-                                },
-                            verticalAlignment = CenterVertically
+                    Row(
+                        verticalAlignment = CenterVertically
+                    ) {
+                        Text(text = "Sortieren nach: ")
+                        Box(
+                            modifier = Modifier.clickable { expanded.value = true },
+                            contentAlignment = Alignment.Center,
                         ) {
-                            RadioButton(
-                                selected = state.sortType == sortType,
-                                onClick = {
-                                    onEvent(FahrzeugEvent.SortContacts(sortType))
-                                }
+                            Text(
+                                text = state.sortType.name,
+                                modifier = Modifier.padding(start = 8.dp, end = 8.dp),
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 16.sp,
                             )
-                            Text(text = sortType.name)
+                            DropdownMenu(
+                                expanded = expanded.value,
+                                onDismissRequest = { expanded.value = false }
+                            ) {
+                                SortType.values().forEach { sortType ->
+                                    DropdownMenuItem(
+                                        onClick = {
+                                            expanded.value = false
+                                            onEvent(FahrzeugEvent.SortContacts(sortType))
+                                        }
+                                    ) {
+                                        Text(text = sortType.name)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -110,7 +124,7 @@ fun FahrzeugScreen(
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             Text(
-                                text = "PS: " + fahrzeug.ps,
+                                text = fahrzeug.ps + " PS",
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )

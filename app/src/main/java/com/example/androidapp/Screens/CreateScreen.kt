@@ -56,32 +56,6 @@ fun CreateScreen(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    SortType.values().forEach { sortType ->
-                        Row(
-                            modifier = Modifier
-                                .clickable {
-                                    onEvent(FahrzeugEvent.SortContacts(sortType))
-                                },
-                            verticalAlignment = CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = state.sortType == sortType,
-                                onClick = {
-                                    onEvent(FahrzeugEvent.SortContacts(sortType))
-                                }
-                            )
-                            Text(text = sortType.name)
-                        }
-                    }
-                }
-            }
             items(state.fahrzeuge) { fahrzeug ->
                 Row(
                     modifier = Modifier.fillMaxWidth()

@@ -52,7 +52,7 @@ fun SettingsItem(
 ) {
     Box(
         modifier = Modifier
-            .fillMaxWidth()
+            .fillMaxWidth(0.95f)
             .height(60.dp)
             .background(backgroundColor, shape = RoundedCornerShape(4.dp))
     ) {
