@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<FahrzeugViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
-                override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     return FahrzeugViewModel(db.dao) as T
                 }
             }

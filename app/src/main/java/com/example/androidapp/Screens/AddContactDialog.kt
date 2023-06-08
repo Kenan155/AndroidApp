@@ -1,5 +1,9 @@
 package com.example.androidapp.Screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +13,10 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -21,6 +29,16 @@ fun AddContactDialog(
     onEvent: (FahrzeugEvent) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var selectedImageUri by remember {
+        mutableStateOf<Uri?>(null)
+    }
+    if (selectedImageUri != null) {
+        onEvent(FahrzeugEvent.SetFotoURL(selectedImageUri.toString()))
+    }
+    val singlePhotoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri -> selectedImageUri = uri }
+    )
     AlertDialog(
         modifier = modifier,
         onDismissRequest = {
@@ -31,6 +49,13 @@ fun AddContactDialog(
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                Button(onClick = {
+                    singlePhotoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }) {
+                    Text(text = "Pick one photo")
+                }
                 TextField(
                     value = state.marke,
                     onValueChange = {

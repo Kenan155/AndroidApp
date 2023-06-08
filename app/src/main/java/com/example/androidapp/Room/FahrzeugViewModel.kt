@@ -1,5 +1,6 @@
 package com.example.androidapp.Room
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidapp.Entity.Fahrzeug
@@ -47,6 +48,7 @@ class FahrzeugViewModel(
                 val marke = state.value.marke
                 val name = state.value.name
                 val ps = state.value.ps
+                val fotoURL = state.value.fotoURL
 
                 if(marke.isBlank() || name.isBlank() || ps.isBlank()) {
                     return
@@ -55,7 +57,8 @@ class FahrzeugViewModel(
                 val contact = Fahrzeug(
                     marke = marke,
                     name = name,
-                    ps = ps
+                    ps = ps,
+                    fotoURL = fotoURL,
                 )
                 viewModelScope.launch {
                     dao.upsertContact(contact)
@@ -64,7 +67,8 @@ class FahrzeugViewModel(
                     isAddingFahrzeug = false,
                     marke = "",
                     name = "",
-                    ps = ""
+                    ps = "",
+                    fotoURL = "",
                 ) }
             }
             is FahrzeugEvent.SetMarke -> {
@@ -80,6 +84,11 @@ class FahrzeugViewModel(
             is FahrzeugEvent.SetPS -> {
                 _state.update { it.copy(
                     ps = event.ps
+                ) }
+            }
+            is FahrzeugEvent.SetFotoURL -> {
+                _state.update { it.copy(
+                    fotoURL = event.fotoURL
                 ) }
             }
             FahrzeugEvent.ShowDialog -> {

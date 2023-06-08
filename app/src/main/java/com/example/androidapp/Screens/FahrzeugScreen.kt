@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberImagePainter
 import com.example.androidapp.Room.FahrzeugEvent
 import com.example.androidapp.Room.FahrzeugState
 import com.example.androidapp.R
@@ -110,7 +111,7 @@ fun FahrzeugScreen(
                     Column {
                         Box(modifier = Modifier.aspectRatio(16f / 9f)) {
                             Image(
-                                painter = painterResource(R.drawable.porsche),
+                                painter = rememberImagePainter(fahrzeug.fotoURL),
                                 contentDescription = null,
                                 modifier = Modifier.fillMaxSize(),
                                 contentScale = ContentScale.Crop
