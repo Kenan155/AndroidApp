@@ -14,4 +14,5 @@ sealed class Screen(val route: String, val title: String, val icon: ImageVector)
     object Post : Screen("post", "Inserieren", Icons.Filled.Add)
     object Messages : Screen("messages", "Nachrichten", Icons.Filled.Phone)
     object Settings : Screen("settings", "Einstellungen", Icons.Filled.Settings)
+    object Details : Screen("details/{fahrzeugId}", "Details", Icons.Filled.Search)
 }

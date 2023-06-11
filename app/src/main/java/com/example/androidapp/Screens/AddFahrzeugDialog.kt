@@ -24,7 +24,7 @@ import com.example.androidapp.Room.FahrzeugEvent
 import com.example.androidapp.Room.FahrzeugState
 
 @Composable
-fun AddContactDialog(
+fun AddFahrzeugDialog(
     state: FahrzeugState,
     onEvent: (FahrzeugEvent) -> Unit,
     modifier: Modifier = Modifier
@@ -61,7 +61,7 @@ fun AddContactDialog(
                     onValueChange = {
                         onEvent(FahrzeugEvent.SetMarke(it))
                     },
-                    placeholder = {
+                    label = {
                         Text(text = "Marke")
                     }
                 )
@@ -70,17 +70,59 @@ fun AddContactDialog(
                     onValueChange = {
                         onEvent(FahrzeugEvent.SetName(it))
                     },
-                    placeholder = {
+                    label = {
                         Text(text = "Name")
                     }
                 )
                 TextField(
-                    value = state.ps,
-                    onValueChange = {
-                        onEvent(FahrzeugEvent.SetPS(it))
+                    value = state.ps.toString(),
+                    onValueChange = { newValue ->
+                        val intValue = newValue.toIntOrNull()
+                        if (intValue != null) {
+                            onEvent(FahrzeugEvent.SetPS(intValue))
+                        }
                     },
-                    placeholder = {
+                    label = {
                         Text(text = "PS")
+                    },
+                )
+                TextField(
+                    value = state.preis.toString(),
+                    onValueChange = { newValue ->
+                        val intValue = newValue.toIntOrNull()
+                        if (intValue != null) {
+                            onEvent(FahrzeugEvent.SetPreis(intValue))
+                        }
+                    },
+                    label = {
+                        Text(text = "Preis")
+                    }
+                )
+                TextField(
+                    value = state.standort,
+                    onValueChange = {
+                        onEvent(FahrzeugEvent.SetStandort(it))
+                    },
+                    label = {
+                        Text(text = "Standort")
+                    }
+                )
+                TextField(
+                    value = state.ausstattung,
+                    onValueChange = {
+                        onEvent(FahrzeugEvent.SetAusstattung(it))
+                    },
+                    label = {
+                        Text(text = "Ausstattung")
+                    }
+                )
+                TextField(
+                    value = state.zeitraum,
+                    onValueChange = {
+                        onEvent(FahrzeugEvent.SetZeitraum(it))
+                    },
+                    label = {
+                        Text(text = "Zeitraum")
                     }
                 )
             }

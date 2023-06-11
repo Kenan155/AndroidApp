@@ -30,6 +30,7 @@ import com.example.androidapp.Room.FahrzeugState
 import com.example.androidapp.Room.FahrzeugViewModel
 import com.example.androidapp.Screens.FahrzeugScreen
 import com.example.androidapp.Screens.CreateScreen
+import com.example.androidapp.Screens.DetailScreen
 import com.example.androidapp.Screens.FavoritenScreen
 import com.example.androidapp.Screens.NachrichtenScreen
 import com.example.androidapp.ui.theme.RoomGuideAndroidTheme
@@ -40,7 +41,7 @@ class MainActivity : ComponentActivity() {
         Room.databaseBuilder(
             applicationContext,
             FahrzeugDatabase::class.java,
-            "contacts.db"
+            "fahrzeuge.db"
         ).build()
     }
     private val viewModel by viewModels<FahrzeugViewModel>(
@@ -64,7 +65,7 @@ class MainActivity : ComponentActivity() {
                         BottomNavigationBar(navController)
                     },
                     content = { innerPadding ->
-                        NavigationHost(navController, modifier = Modifier.padding(innerPadding))
+                        NavigationHost(navController, modifier = Modifier.padding(innerPadding), state = viewModel.state.collectAsState().value)
                     }
                 )
             }
@@ -110,14 +111,25 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun NavigationHost(navController: NavHostController, modifier: Modifier = Modifier) {
+    fun NavigationHost(navController: NavHostController, state: FahrzeugState, modifier: Modifier = Modifier) {
         Box(modifier) {
             NavHost(navController, startDestination = Screen.Search.route) {
                 composable(Screen.Favorites.route) { FavoritesScreen() }
-                composable(Screen.Search.route) { SearchScreen(viewModel.state.collectAsState().value) }
+                composable(Screen.Search.route) { SearchScreen(viewModel.state.collectAsState().value, navController = navController) }
                 composable(Screen.Post.route) { PostScreen() }
                 composable(Screen.Messages.route) { MessagesScreen() }
                 composable(Screen.Settings.route) { SettingsScreen() }
+                composable("details/{fahrzeugId}") { backStackEntry ->
+                    val fahrzeugId = backStackEntry.arguments?.getString("fahrzeugId")?.toIntOrNull()
+                    val fahrzeug = fahrzeugId?.let { id ->
+                        state.fahrzeuge.find { it.id == id }
+                    }
+                    if (fahrzeug != null) {
+                        DetailScreen(fahrzeug = fahrzeug, navController = navController)
+                    } else {
+                        // Handle invalid fahrzeugId or show error screen
+                    }
+                }
             }
         }
     }
@@ -131,10 +143,10 @@ class MainActivity : ComponentActivity() {
 
 
     @Composable
-    fun SearchScreen(state: FahrzeugState) {
+    fun SearchScreen(state: FahrzeugState, navController: NavHostController) {
 
         val state by viewModel.state.collectAsState()
-        FahrzeugScreen(state = state, onEvent = viewModel::onEvent)
+        FahrzeugScreen(state = state, onEvent = viewModel::onEvent, navController = navController)
     }
 
     @Composable

@@ -9,9 +9,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -19,27 +16,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.example.androidapp.Room.FahrzeugEvent
 import com.example.androidapp.Room.FahrzeugState
-import com.example.androidapp.R
 import com.example.androidapp.Room.SortType
 
 @Composable
 fun FahrzeugScreen(
     state: FahrzeugState,
-    onEvent: (FahrzeugEvent) -> Unit
+    onEvent: (FahrzeugEvent) -> Unit,
+    navController: NavHostController
 ) {
     val (searchQuery, setSearchQuery) = remember { mutableStateOf("") }
     val expanded = remember { mutableStateOf(false) }
 
     Scaffold() { _ ->
         if(state.isAddingFahrzeug) {
-            AddContactDialog(state = state, onEvent = onEvent)
+            AddFahrzeugDialog(state = state, onEvent = onEvent)
         }
 
         LazyColumn(
@@ -75,7 +72,7 @@ fun FahrzeugScreen(
                                     DropdownMenuItem(
                                         onClick = {
                                             expanded.value = false
-                                            onEvent(FahrzeugEvent.SortContacts(sortType))
+                                            onEvent(FahrzeugEvent.SortFahrzeuge(sortType))
                                         }
                                     ) {
                                         Text(text = sortType.name)
@@ -90,23 +87,27 @@ fun FahrzeugScreen(
                 TextField(
                     value = searchQuery,
                     onValueChange = setSearchQuery,
-                    label = { Text(text = "Search") },
+                    label = { Text(text = "Suche nach Standort") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 8.dp, horizontal = 1.dp)
                 )
             }
-            val filteredContacts = if (searchQuery.isBlank()) {
+            val filteredFahrzeuge = if (searchQuery.isBlank()) {
                 state.fahrzeuge
             } else {
                 state.fahrzeuge.filter { fahrzeug ->
-                    fahrzeug.name.contains(searchQuery, ignoreCase = true)
+                    fahrzeug.standort.contains(searchQuery, ignoreCase = true)
                 }
             }
-            items(filteredContacts) { fahrzeug ->
+            items(filteredFahrzeuge) { fahrzeug ->
                 Card(
                     shape = RoundedCornerShape(16.dp),
-                    modifier = Modifier.padding(1.dp)
+                    modifier = Modifier
+                        .padding(1.dp)
+                        .clickable {
+                            navController.navigate("details/${fahrzeug.id}") // Navigate to details page with specific Fahrzeug ID
+                        }
                 ) {
                     Column {
                         Box(modifier = Modifier.aspectRatio(16f / 9f)) {
@@ -125,8 +126,8 @@ fun FahrzeugScreen(
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             Text(
-                                text = fahrzeug.ps + " PS",
-                                fontSize = 12.sp,
+                                text = fahrzeug.preis.toString() + " €",
+                                fontSize = 25.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             // Add more text or other content here if needed

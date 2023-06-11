@@ -1,6 +1,5 @@
 package com.example.androidapp.Room
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidapp.Entity.Fahrzeug
@@ -14,20 +13,20 @@ class FahrzeugViewModel(
 ): ViewModel() {
 
     private val _sortType = MutableStateFlow(SortType.MARKE)
-    private val _contacts = _sortType
+    private val _fahrzeuge = _sortType
         .flatMapLatest { sortType ->
             when(sortType) {
-                SortType.MARKE -> dao.getContactsOrderedByFirstName()
-                SortType.NAME -> dao.getContactsOrderedByLastName()
-                SortType.PS -> dao.getContactsOrderedByPhoneNumber()
+                SortType.MARKE -> dao.getFahrzeugeOrderedByMarke()
+                SortType.NAME -> dao.getFahrzeugeOrderedByName()
+                SortType.PS -> dao.getFahrzeugeOrderedByPS()
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     private val _state = MutableStateFlow(FahrzeugState())
-    val state = combine(_state, _sortType, _contacts) { state, sortType, contacts ->
+    val state = combine(_state, _sortType, _fahrzeuge) { state, sortType, fahrzeuge ->
         state.copy(
-            fahrzeuge = contacts,
+            fahrzeuge = fahrzeuge,
             sortType = sortType
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), FahrzeugState())
@@ -36,7 +35,7 @@ class FahrzeugViewModel(
         when(event) {
             is FahrzeugEvent.DeleteFahrzeug -> {
                 viewModelScope.launch {
-                    dao.deleteContact(event.contact)
+                    dao.deleteFahrzeug(event.fahrzeug)
                 }
             }
             FahrzeugEvent.HideDialog -> {
@@ -48,26 +47,38 @@ class FahrzeugViewModel(
                 val marke = state.value.marke
                 val name = state.value.name
                 val ps = state.value.ps
+                val preis = state.value.preis
+                val standort = state.value.standort
+                val ausstattung = state.value.ausstattung
+                val zeitraum = state.value.zeitraum
                 val fotoURL = state.value.fotoURL
 
-                if(marke.isBlank() || name.isBlank() || ps.isBlank()) {
+                if(marke.isBlank() || name.isBlank()) {
                     return
                 }
 
-                val contact = Fahrzeug(
+                val fahrzeug = Fahrzeug(
                     marke = marke,
                     name = name,
                     ps = ps,
+                    preis = preis,
+                    standort = standort,
+                    ausstattung = ausstattung,
+                    zeitraum = zeitraum,
                     fotoURL = fotoURL,
                 )
                 viewModelScope.launch {
-                    dao.upsertContact(contact)
+                    dao.upsertFahrzeug(fahrzeug)
                 }
                 _state.update { it.copy(
                     isAddingFahrzeug = false,
                     marke = "",
                     name = "",
-                    ps = "",
+                    ps = 0,
+                    preis = 0,
+                    standort = "",
+                    ausstattung = "",
+                    zeitraum = "",
                     fotoURL = "",
                 ) }
             }
@@ -86,6 +97,26 @@ class FahrzeugViewModel(
                     ps = event.ps
                 ) }
             }
+            is FahrzeugEvent.SetPreis -> {
+                _state.update { it.copy(
+                    preis = event.preis
+                ) }
+            }
+            is FahrzeugEvent.SetStandort -> {
+                _state.update { it.copy(
+                    standort = event.standort
+                ) }
+            }
+            is FahrzeugEvent.SetAusstattung -> {
+                _state.update { it.copy(
+                    ausstattung = event.ausstattung
+                ) }
+            }
+            is FahrzeugEvent.SetZeitraum -> {
+                _state.update { it.copy(
+                    zeitraum = event.zeitraum
+                ) }
+            }
             is FahrzeugEvent.SetFotoURL -> {
                 _state.update { it.copy(
                     fotoURL = event.fotoURL
@@ -96,7 +127,7 @@ class FahrzeugViewModel(
                     isAddingFahrzeug = true
                 ) }
             }
-            is FahrzeugEvent.SortContacts -> {
+            is FahrzeugEvent.SortFahrzeuge -> {
                 _sortType.value = event.sortType
             }
         }

@@ -8,17 +8,17 @@ import kotlinx.coroutines.flow.Flow
 interface FahrzeugDao {
 
     @Upsert
-    suspend fun upsertContact(contact: Fahrzeug)
+    suspend fun upsertFahrzeug(fahrzeug: Fahrzeug)
 
     @Delete
-    suspend fun deleteContact(contact: Fahrzeug)
+    suspend fun deleteFahrzeug(fahrzeug: Fahrzeug)
 
     @Query("SELECT * FROM fahrzeug ORDER BY marke ASC")
-    fun getContactsOrderedByFirstName(): Flow<List<Fahrzeug>>
+    fun getFahrzeugeOrderedByMarke(): Flow<List<Fahrzeug>>
 
     @Query("SELECT * FROM fahrzeug ORDER BY name ASC")
-    fun getContactsOrderedByLastName(): Flow<List<Fahrzeug>>
+    fun getFahrzeugeOrderedByName(): Flow<List<Fahrzeug>>
 
     @Query("SELECT * FROM fahrzeug ORDER BY ps ASC")
-    fun getContactsOrderedByPhoneNumber(): Flow<List<Fahrzeug>>
+    fun getFahrzeugeOrderedByPS(): Flow<List<Fahrzeug>>
 }
